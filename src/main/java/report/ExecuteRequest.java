@@ -2,7 +2,6 @@ package report;
 
 import com.google.gson.Gson;
 import okhttp3.*;
-import okhttp3.Headers.Builder;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -106,17 +105,6 @@ public class ExecuteRequest {
         return ""; // Заменить на логику формирования ссылки
     }
 
-    private static class RulesSearchResult {
-        List<Rule> rules;
-
-        static class Rule {
-            String key;
-            String name;
-            String htmlDesc;
-            String severity;
-        }
-    }
-
     private static class IssuesSearchResult {
         List<Issue> issues;
 
@@ -130,4 +118,70 @@ public class ExecuteRequest {
             String key;
         }
     }
+
+
+    public Map<String, Object> executeHotspotsSearch(String sonarurl, String sonarcomponent) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("hotspots", new HashMap<String, Object>());
+        Headers.Builder headers = new Headers.Builder();
+
+        reportGenerator.authenticate(headers);
+
+        int pageSize = 500;
+        int maxResults = 10000;
+        int maxPage = maxResults / pageSize;
+        int page = 1;
+        int nbResults;
+
+        do {
+            try {
+                String hotspotsUrl = sonarurl + String.format("/api/hotspots/search?projectKey=%s&ps=%d&p=%d", sonarcomponent, pageSize, page);
+                Request request = new Request.Builder()
+                        .url(hotspotsUrl)
+                        .get()
+                        .headers(reportGenerator.getHeaders().build())
+                        .build();
+
+                Response response = client.newCall(request).execute();
+                if (!response.isSuccessful()) {
+                    System.err.println("Failed to get hotspots. Status code: " + response.code());
+                    return null;
+                }
+
+                String responseBody = response.body().string();
+                HotspotsSearchResult hotspotsSearchResult = gson.fromJson(responseBody, HotspotsSearchResult.class);
+                nbResults = hotspotsSearchResult.hotspots.size();
+
+                hotspotsSearchResult.hotspots.forEach(hotspot -> {
+                    Map<String, Object> hotspotData = new HashMap<>();
+                    hotspotData.put("message", hotspot.message);
+                    hotspotData.put("status", hotspot.status);
+                    hotspotData.put("component", hotspot.component.split(":")[1]);
+                    hotspotData.put("line", hotspot.line);
+
+                    ((Map<String, Object>) data.get("hotspots")).put(hotspot.key, hotspotData);
+                });
+
+                page++;
+            } catch (IOException e) {
+                System.err.println("Error occurred during hotspot API request: " + e.getMessage());
+                return null;
+            }
+        } while (nbResults == pageSize && page <= maxPage);
+
+        return data;
+    }
+
+    private static class HotspotsSearchResult {
+        List<Hotspot> hotspots;
+
+        static class Hotspot {
+            String key;
+            String message;
+            String status;
+            String component;
+            int line;
+        }
+    }
+
 }

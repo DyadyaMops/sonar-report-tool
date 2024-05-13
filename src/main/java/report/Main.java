@@ -44,6 +44,7 @@ public class Main {
 
         // Выполняем поиск проблем (issues) с использованием ExecuteRequest
         Map<String, Object> issuesData = executeRequest.executeIssuesSearch(sonarurl, sonarcomponent);
+        Map<String, Object> hotspotsData = executeRequest.executeHotspotsSearch(sonarurl, sonarcomponent);
 
         // Обработка результатов
         if (issuesData != null) {
@@ -51,6 +52,13 @@ public class Main {
             System.out.println(issuesData); // Вывод данных о проблемах в консоль или дальнейшая обработка
         } else {
             System.err.println("Failed to retrieve issues.");
+        }
+
+        if (hotspotsData != null) {
+            System.out.println("Hotspots retrieved successfully:");
+            System.out.println(hotspotsData); // Вывод данных о проблемах в консоль или дальнейшая обработка
+        } else {
+            System.err.println("Failed to retrieve hotspots.");
         }
     }
 }
