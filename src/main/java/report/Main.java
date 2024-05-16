@@ -2,7 +2,10 @@ package report;
 
 import picocli.CommandLine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.io.IOException;
 
 public class Main {
 
@@ -43,22 +46,58 @@ public class Main {
         ExecuteRequest executeRequest = new ExecuteRequest(reportGenerator);
 
         // Выполняем поиск проблем (issues) с использованием ExecuteRequest
-        Map<String, Object> issuesData = executeRequest.executeIssuesSearch(sonarurl, sonarcomponent);
-        Map<String, Object> hotspotsData = executeRequest.executeHotspotsSearch(sonarurl, sonarcomponent);
+        Map<String, Object> issuesData = executeRequest.executeIssuesSearch(sonarurl);
+        Map<String, Object> hotspotsData = executeRequest.executeHotspotsSearch(sonarurl);
 
-        // Обработка результатов
-        if (issuesData != null) {
-            System.out.println("Issues retrieved successfully:");
-            System.out.println(issuesData); // Вывод данных о проблемах в консоль или дальнейшая обработка
-        } else {
-            System.err.println("Failed to retrieve issues.");
+        List<Issue> issuesList = new ArrayList<>();
+        if (issuesData != null && issuesData.containsKey("issues")) {
+            Map<String, Object> issuesMap = (Map<String, Object>) issuesData.get("issues");
+            for (Map.Entry<String, Object> entry : issuesMap.entrySet()) {
+                Map<String, Object> issueData = (Map<String, Object>) entry.getValue();
+                Issue issue = new Issue();
+                issue.setRule((String) issueData.get("rule"));
+                issue.setSeverity((String) issueData.get("severity"));
+                issue.setStatus((String) issueData.get("status"));
+                issue.setComponent((String) issueData.get("component"));
+                issue.setLine((int) issueData.get("line"));
+                issue.setDescription((String) issueData.get("description"));
+                issue.setMessage((String) issueData.get("message"));
+                issue.setKey(entry.getKey());
+                issuesList.add(issue);
+            }
         }
 
-        if (hotspotsData != null) {
-            System.out.println("Hotspots retrieved successfully:");
-            System.out.println(hotspotsData); // Вывод данных о проблемах в консоль или дальнейшая обработка
-        } else {
-            System.err.println("Failed to retrieve hotspots.");
+        // Преобразуем данные о hotspots в список Hotspot
+        List<Hotspot> hotspotsList = new ArrayList<>();
+        if (hotspotsData != null && hotspotsData.containsKey("hotspots")) {
+            Map<String, Object> hotspotsMap = (Map<String, Object>) hotspotsData.get("hotspots");
+            for (Map.Entry<String, Object> entry : hotspotsMap.entrySet()) {
+                Map<String, Object> hotspotData = (Map<String, Object>) entry.getValue();
+                Hotspot hotspot = new Hotspot();
+                hotspot.setMessage((String) hotspotData.get("message"));
+                hotspot.setStatus((String) hotspotData.get("status"));
+                hotspot.setComponent((String) hotspotData.get("component"));
+                hotspot.setLine((int) hotspotData.get("line"));
+                hotspot.setKey(entry.getKey());
+                hotspotsList.add(hotspot);
+            }
+        }
+
+        // Обработка результатов
+        if (issuesData != null || hotspotsData != null){
+            System.out.println("Issues retrieved successfully:");
+            System.out.println(issuesData);
+            // Вывод данных о проблемах в консоль или дальнейшая обработка
+            try {
+                String issuesFilePath = "issues_report.json";
+                reportGenerator.generateJsonReport(project, application, sonarurl, sonarcomponent, issuesList, hotspotsList, issuesFilePath);
+                System.out.println("Issues report saved to: " + issuesFilePath);
+            } catch (IOException e) {
+                System.err.println("Failed to save issues report: " + e.getMessage());
+            }
+        }else{
+            System.err.println("Failed to retrieve issues.");
         }
     }
 }
+

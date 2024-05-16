@@ -1,13 +1,16 @@
 package report;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.*;
 import okhttp3.Headers.Builder;
 
 import java.io.IOException;
+import java.io.FileWriter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 
 public class ReportGenerator {
@@ -117,9 +120,27 @@ public class ReportGenerator {
         }
         return headers;
     }
+
     public Headers.Builder getHeaders() {
         Headers.Builder headersBuilder = new Headers.Builder();
         authenticate(headersBuilder);
         return headersBuilder;
     }
+
+    public void generateJsonReport(String project, String application, String sonarurl, String sonarcomponent,
+                                   List<Issue> issues, List<Hotspot> hotspots, String filePath) throws IOException {
+        // Создаем объект для представления отчета
+        Report report = new Report(project, application, sonarurl, sonarcomponent, issues, hotspots);
+
+        // Преобразуем объект отчета в JSON
+        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonReport = gson.toJson(report);
+
+        // Записываем JSON-строку в файл
+        try (FileWriter writer = new FileWriter(filePath)) {
+            writer.write(jsonReport);
+        }
+
+    }
 }
+

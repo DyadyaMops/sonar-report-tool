@@ -41,7 +41,7 @@ public class ExecuteRequest {
     }
 
 
-    public Map<String, Object> executeIssuesSearch(String sonarurl, String sonarсomponent) {
+    public Map<String, Object> executeIssuesSearch(String sonarurl) {
         Map<String, Object> data = new HashMap<>();
         data.put("issues", new HashMap<String, Object>());
         data.put("rules", new HashMap<String, Object>());
@@ -120,7 +120,7 @@ public class ExecuteRequest {
     }
 
 
-    public Map<String, Object> executeHotspotsSearch(String sonarurl, String sonarcomponent) {
+    public Map<String, Object> executeHotspotsSearch(String sonarurl) {
         Map<String, Object> data = new HashMap<>();
         data.put("hotspots", new HashMap<String, Object>());
         Headers.Builder headers = new Headers.Builder();
