@@ -36,6 +36,9 @@ public class Commands implements Runnable {
     @Option(names = "--save-report-json", description = "Save the report data in JSON format. Set to target file name")
     public String saveReportJson;
 
+    @Option(names = "--save-report-sarif", description = "Save the report data in JSON format. Set to target file name")
+    public String saveReportSarif;
+
     @Option(names = "--help", usageHelp = true, description = "Display this help message.")
     public boolean helpRequested;
 

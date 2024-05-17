@@ -19,44 +19,4 @@ public class Report {
         this.issues = issues;
         this.hotspots = hotspots;
     }
-
-    public String getproject() {
-        return project;
-    }
-
-    public void setproject(String project) {
-        this.project = project;
-    }
-
-    public String getApplicationName() {
-        return application;
-    }
-
-    public void setApplicationName(String application) {
-        this.application = application;
-    }
-
-    public String getSonarBaseURL() {
-        return sonarurl;
-    }
-
-    public void setSonarBaseURL(String sonarurl) {
-        this.sonarurl = sonarurl;
-    }
-
-    public String getSonarComponent() {
-        return sonarcomponent;
-    }
-
-    public void setSonarComponent(String sonarcomponent) {
-        this.sonarcomponent = sonarcomponent;
-    }
-
-    public List<Issue> getIssues() {
-        return issues;
-    }
-
-    public void setIssues(List<Issue> issues) {
-        this.issues = issues;
-    }
 }

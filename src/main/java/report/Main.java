@@ -35,6 +35,7 @@ public class Main {
         String sonarcomponent = commands.sonarcomponent;
         String sonartoken = commands.sonartoken;
         String saveReportJson = commands.saveReportJson;
+        String saveReportSarif = commands.saveReportSarif;
 
         // Создаем экземпляр ReportGenerator на основе переданных аргументов
         ReportGenerator reportGenerator = new ReportGenerator(
@@ -86,10 +87,9 @@ public class Main {
         // Обработка результатов
         if (issuesData != null || hotspotsData != null){
             System.out.println("Issues retrieved successfully:");
-            System.out.println(issuesData);
             // Вывод данных о проблемах в консоль или дальнейшая обработка
             try {
-                String issuesFilePath = "issues_report.json";
+                String issuesFilePath = saveReportJson;
                 reportGenerator.generateJsonReport(project, application, sonarurl, sonarcomponent, issuesList, hotspotsList, issuesFilePath);
                 System.out.println("Issues report saved to: " + issuesFilePath);
             } catch (IOException e) {
@@ -98,6 +98,10 @@ public class Main {
         }else{
             System.err.println("Failed to retrieve issues.");
         }
+
+        JsonToSarifConverter jsontosarifconverter = new JsonToSarifConverter(sonarurl);
+        jsontosarifconverter.convertJsonToSarif(saveReportJson, saveReportSarif);
+
     }
 }
 

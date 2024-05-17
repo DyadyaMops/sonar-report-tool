@@ -47,38 +47,6 @@ public class ReportGenerator {
         }
     }
 
-    public String getVersion() {
-        OkHttpClient client = new OkHttpClient();
-        Gson gson = new Gson();
-        String apiUrl = sonarurl + "/api/system/status";
-
-        Request request = new Request.Builder()
-                .url(apiUrl)
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                String responseBody = response.body().string();
-                VersionInfo versionInfo = gson.fromJson(responseBody, VersionInfo.class);
-                return versionInfo.getVersion();
-            } else {
-                System.err.println("Failed to fetch SonarQube version. Status code: " + response.code());
-            }
-        } catch (IOException e) {
-            System.err.println("Error occurred while getting SonarQube version: " + e.getMessage());
-        }
-        return null;
-    }
-
-    private static class VersionInfo {
-        private String version;
-
-        public String getVersion() {
-            return version;
-        }
-    }
-
     public Builder authenticate(Builder headers) {
         if (sonarusername != null && sonarpassword != null) {
             // Form authentication with username/password
