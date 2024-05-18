@@ -96,9 +96,34 @@ public class ExecuteRequest {
                 return null;
             }
         } while (nbResults == pageSize && page <= maxPage);
-
+        Map<String, Integer> summary = generateSummary(data);
+        data.put("summary", summary);
         return data;
     }
+
+    private Map<String, Integer> generateSummary(Map<String, Object> data) {
+        Map<String, Object> issues = (Map<String, Object>) data.get("issues");
+        Map<String, Integer> summary = new HashMap<>();
+
+        // Инициализируем начальное количество проблем каждой серьезности
+        summary.put("BLOCKER", 0);
+        summary.put("CRITICAL", 0);
+        summary.put("MAJOR", 0);
+        summary.put("MINOR", 0);
+
+        // Проходим по всем проблемам и увеличиваем счетчик для каждой серьезности
+        for (Object value : issues.values()) {
+            Map<String, Object> issue = (Map<String, Object>) value;
+            String severity = (String) issue.get("severity");
+
+            // Получаем текущее количество проблем данной серьезности и увеличиваем его на 1
+            int count = summary.getOrDefault(severity, 0);
+            summary.put(severity, count + 1);
+        }
+
+        return summary;
+    }
+
 
     private String issueLink(Map<String, Object> data, IssuesSearchResult.Issue issue) {
         // Реализация логики для формирования ссылки на проблему (issue)

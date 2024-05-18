@@ -36,6 +36,7 @@ public class Main {
         String sonartoken = commands.sonartoken;
         String saveReportJson = commands.saveReportJson;
         String saveReportSarif = commands.saveReportSarif;
+        String saveReportHtml = commands.saveReportHtml;
 
         // Создаем экземпляр ReportGenerator на основе переданных аргументов
         ReportGenerator reportGenerator = new ReportGenerator(
@@ -65,6 +66,8 @@ public class Main {
                 issue.setMessage((String) issueData.get("message"));
                 issue.setKey(entry.getKey());
                 issuesList.add(issue);
+
+                //TODO добавить обработку summary по issues и убрать двойной вывод о генерации файлов в консоль
             }
         }
 
@@ -85,23 +88,33 @@ public class Main {
         }
 
         // Обработка результатов
-        if (issuesData != null || hotspotsData != null){
-            System.out.println("Issues retrieved successfully:");
-            // Вывод данных о проблемах в консоль или дальнейшая обработка
+        if (issuesData != null || hotspotsData != null) {
+            System.out.println("Issues and hotspots retrieved successfully:");
+            // Вывод данных о проблемах и hotspots в консоль или дальнейшая обработка
             try {
                 String issuesFilePath = saveReportJson;
                 reportGenerator.generateJsonReport(project, application, sonarurl, sonarcomponent, issuesList, hotspotsList, issuesFilePath);
-                System.out.println("Issues report saved to: " + issuesFilePath);
+                System.out.println("Issues and hotspots report saved to: " + issuesFilePath);
+
+                // Проверка наличия флагов для сохранения в формате SARIF
+                if (saveReportJson != null && !saveReportJson.isEmpty() && saveReportSarif != null && !saveReportSarif.isEmpty()) {
+                    JsonToSarifConverter jsonToSarifConverter = new JsonToSarifConverter(sonarurl);
+                    jsonToSarifConverter.convertJsonToSarif(saveReportJson, saveReportSarif);
+                    System.out.println("SARIF report saved to: " + saveReportSarif);
+                }
+
+                // Проверка наличия флага для сохранения HTML отчета
+                if (saveReportHtml != null && !saveReportHtml.isEmpty()) {
+                    JsonToHtmlReportConverter jsonToHtmlReportConverter = new JsonToHtmlReportConverter();
+                    jsonToHtmlReportConverter.convertJsonToHtml(saveReportJson, saveReportHtml);
+                    System.out.println("HTML report saved to: " + saveReportHtml);
+                }
             } catch (IOException e) {
-                System.err.println("Failed to save issues report: " + e.getMessage());
+                System.err.println("Failed to save issues and hotspots report: " + e.getMessage());
             }
-        }else{
-            System.err.println("Failed to retrieve issues.");
+        } else {
+            System.err.println("Failed to retrieve issues and hotspots.");
         }
-
-        JsonToSarifConverter jsontosarifconverter = new JsonToSarifConverter(sonarurl);
-        jsontosarifconverter.convertJsonToSarif(saveReportJson, saveReportSarif);
-
     }
 }
 
