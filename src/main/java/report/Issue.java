@@ -9,6 +9,11 @@ public class Issue {
     private String description;
     private String message;
     private String key;
+    private int summary;
+
+    public void setSummary(int summary) {
+        this.summary = summary;
+    }
 
     public void setRule(String rule) {
         this.rule = rule;

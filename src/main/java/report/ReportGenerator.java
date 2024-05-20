@@ -107,6 +107,7 @@ public class ReportGenerator {
         // Записываем JSON-строку в файл
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(jsonReport);
+            System.out.println("JSON report saved to: " + filePath);
         }
 
     }

@@ -66,8 +66,6 @@ public class Main {
                 issue.setMessage((String) issueData.get("message"));
                 issue.setKey(entry.getKey());
                 issuesList.add(issue);
-
-                //TODO добавить обработку summary по issues и убрать двойной вывод о генерации файлов в консоль
             }
         }
 
@@ -94,20 +92,17 @@ public class Main {
             try {
                 String issuesFilePath = saveReportJson;
                 reportGenerator.generateJsonReport(project, application, sonarurl, sonarcomponent, issuesList, hotspotsList, issuesFilePath);
-                System.out.println("Issues and hotspots report saved to: " + issuesFilePath);
 
                 // Проверка наличия флагов для сохранения в формате SARIF
                 if (saveReportJson != null && !saveReportJson.isEmpty() && saveReportSarif != null && !saveReportSarif.isEmpty()) {
                     JsonToSarifConverter jsonToSarifConverter = new JsonToSarifConverter(sonarurl);
                     jsonToSarifConverter.convertJsonToSarif(saveReportJson, saveReportSarif);
-                    System.out.println("SARIF report saved to: " + saveReportSarif);
                 }
 
                 // Проверка наличия флага для сохранения HTML отчета
                 if (saveReportHtml != null && !saveReportHtml.isEmpty()) {
                     JsonToHtmlReportConverter jsonToHtmlReportConverter = new JsonToHtmlReportConverter();
                     jsonToHtmlReportConverter.convertJsonToHtml(saveReportJson, saveReportHtml);
-                    System.out.println("HTML report saved to: " + saveReportHtml);
                 }
             } catch (IOException e) {
                 System.err.println("Failed to save issues and hotspots report: " + e.getMessage());
