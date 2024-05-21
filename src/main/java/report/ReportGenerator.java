@@ -12,13 +12,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
+/*Класс, в котором мы
+    1) авторизуемся через API SonarQube
+    2) сохраняем отчет в JSON
+ */
 
 public class ReportGenerator {
 
     public String project;
     public String application;
-    public String branch;
-    public String release;
     public String sonarurl;
     public String sonarusername;
     public String sonarpassword;
@@ -26,11 +28,9 @@ public class ReportGenerator {
     public String sonartoken;
     public String saveReportJson;
 
-    public ReportGenerator(String project, String application, String branch, String release, String sonarurl, String sonarusername, String sonarpassword, String sonarcomponent, String sonartoken, String saveReportJson) {
+    public ReportGenerator(String project, String application, String sonarurl, String sonarusername, String sonarpassword, String sonarcomponent, String sonartoken, String saveReportJson) {
         this.project = project;
         this.application = application;
-        this.branch = branch;
-        this.release = release;
         this.sonarurl = sonarurl;
         this.sonarusername = sonarusername;
         this.sonarpassword = sonarpassword;
@@ -49,7 +49,6 @@ public class ReportGenerator {
 
     public Builder authenticate(Builder headers) {
         if (sonarusername != null && sonarpassword != null) {
-            // Form authentication with username/password
             String loginUrl = sonarurl + "/api/authentication/login";
             String requestBody = "login=" + encodeURIComponent(sonarusername) +
                     "&password=" + encodeURIComponent(sonarpassword);
@@ -80,8 +79,7 @@ public class ReportGenerator {
             } catch (IOException e) {
                 System.err.println("Error occurred during authentication: " + e.getMessage());
             }
-        } else if (sonartoken != null) {
-            // Basic authentication with user token
+        } else if (sonartoken != null) { //аутентификация по токену вместо логина и пароля
             String authToken = sonartoken + ":";
             String base64Token = Base64.getEncoder().encodeToString(authToken.getBytes(StandardCharsets.UTF_8));
             headers.add("Authorization", "Basic " + base64Token);
@@ -97,14 +95,11 @@ public class ReportGenerator {
 
     public void generateJsonReport(String project, String application, String sonarurl, String sonarcomponent,
                                    List<Issue> issues, List<Hotspot> hotspots, String filePath) throws IOException {
-        // Создаем объект для представления отчета
         Report report = new Report(project, application, sonarurl, sonarcomponent, issues, hotspots);
 
-        // Преобразуем объект отчета в JSON
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonReport = gson.toJson(report);
 
-        // Записываем JSON-строку в файл
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(jsonReport);
             System.out.println("JSON report saved to: " + filePath);

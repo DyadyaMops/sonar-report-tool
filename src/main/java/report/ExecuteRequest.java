@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/*Класс выполняющий запросы к API и извлекающий Issues и Hotspots*/
+
 public class ExecuteRequest {
 
     private final ReportGenerator reportGenerator;
@@ -16,8 +18,6 @@ public class ExecuteRequest {
 
     public String project;
     public String application;
-    public String branch;
-    public String release;
     public String sonarurl;
     public String sonarusername;
     public String sonarpassword;
@@ -30,8 +30,6 @@ public class ExecuteRequest {
         this.reportGenerator = reportGenerator;
         this.project = reportGenerator.project;
         this.application = reportGenerator.application;
-        this.branch = reportGenerator.branch;
-        this.release = reportGenerator.release;
         this.sonarurl = reportGenerator.sonarurl;
         this.sonarusername = reportGenerator.sonarusername;
         this.sonarpassword = reportGenerator.sonarpassword;
@@ -88,7 +86,7 @@ public class ExecuteRequest {
                             "rule", issue.rule,
                             "severity", issue.severity != null ? issue.severity : rule.get("severity"),
                             "status", issue.status,
-                            "link", issueLink(data, issue),
+                            "ruleUrl", ruleLink(sonarurl, issue.key),
                             "component", issue.component.split(":")[1], // Получить только имя файла без пути
                             "line", issue.line,
                             "description", message,
@@ -108,9 +106,9 @@ public class ExecuteRequest {
         return data;
     }
 
-    private String issueLink(Map<String, Object> data, IssuesSearchResult.Issue issue) {
-        // Реализация логики для формирования ссылки на проблему (issue)
-        return ""; // Заменить на логику формирования ссылки
+    private String ruleLink(String sonarurl, String ruleKey) {
+        String ruleUrl = sonarurl + "/coding_rules?open=" + ruleKey;
+        return ruleUrl;
     }
 
     private static class IssuesSearchResult {
@@ -164,6 +162,7 @@ public class ExecuteRequest {
                     Map<String, Object> hotspotData = new HashMap<>();
                     hotspotData.put("message", hotspot.message);
                     hotspotData.put("status", hotspot.status);
+                    hotspotData.put("ruleUrl", ruleLink(sonarurl, hotspot.key));
                     hotspotData.put("component", hotspot.component.split(":")[1]);
                     hotspotData.put("line", hotspot.line);
 
@@ -184,6 +183,7 @@ public class ExecuteRequest {
         List<Hotspot> hotspots;
 
         static class Hotspot {
+            String ruleUrl;
             String key;
             String message;
             String status;

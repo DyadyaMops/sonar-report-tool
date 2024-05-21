@@ -12,8 +12,8 @@ import okhttp3.Response;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+
+/*Класс переводящий json в формат sarif (Static Analysis Results Interchange Format) */
 
 public class JsonToSarifConverter {
 

@@ -10,6 +10,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+/*Класс генерирующий из json html*/
+
 public class JsonToHtmlReportConverter {
 
     public void convertJsonToHtml(String jsonFilePath, String htmlFilePath) {
@@ -46,10 +48,6 @@ public class JsonToHtmlReportConverter {
         html.append("<h1>SonarQube Vulnerability Report</h1>");
         html.append("<p>Project Name: ").append(jsonData.get("project")).append("</p>");
         html.append("<p>Application: ").append(jsonData.get("application")).append("</p>");
-        html.append("<p>Branch: ").append(jsonData.get("branch")).append("</p>");
-        html.append("<p>Release: ").append(jsonData.get("release")).append("</p>");
-
-        // Add details of the detected vulnerabilities
         if (jsonData.get("issues") != null) {
             List<Map<String, Object>> issuesList = (List<Map<String, Object>>) jsonData.get("issues");
             html.append("<h2>Detail of the Detected Vulnerabilities</h2>");
@@ -57,7 +55,9 @@ public class JsonToHtmlReportConverter {
 
             for (Map<String, Object> issueMap : issuesList) {
                 html.append("<tr>");
-                html.append("<td>").append(issueMap.get("rule")).append("</td>");
+                String rule = (String) issueMap.get("rule");
+                String ruleUrl = (String) issueMap.get("ruleUrl");
+                html.append("<td><a href=\"").append(ruleUrl).append("\">").append(rule).append("</a></td>");
                 html.append("<td>").append(issueMap.get("severity")).append("</td>");
                 html.append("<td>").append(issueMap.get("component")).append("</td>");
                 html.append("<td>").append(issueMap.get("line")).append("</td>");
@@ -65,6 +65,23 @@ public class JsonToHtmlReportConverter {
                 html.append("<td>").append(issueMap.get("message")).append("</td>");
                 html.append("<td>").append(issueMap.get("status")).append("</td>");
                 html.append("</tr>");
+            }
+
+            html.append("<tr><td colspan=\"7\"><hr></td></tr>");
+
+            if (jsonData.get("hotspots") != null) {
+                List<Map<String, Object>> hotspotsList = (List<Map<String, Object>>) jsonData.get("hotspots");
+                for (Map<String, Object> hotspotMap : hotspotsList) {
+                    html.append("<tr>");
+                    String hotspotKey = (String) hotspotMap.get("key");
+                    String hotspotUrl = (String) hotspotMap.get("ruleUrl");
+                    html.append("<td><a href=\"").append(hotspotUrl).append("\">").append(hotspotKey).append("</a></td>");
+                    html.append("<td>").append(hotspotMap.get("message")).append("</td>");
+                    html.append("<td>").append(hotspotMap.get("status")).append("</td>");
+                    html.append("<td>").append(hotspotMap.get("component")).append("</td>");
+                    html.append("<td>").append(hotspotMap.get("line")).append("</td>");
+                    html.append("</tr>");
+                }
             }
 
             html.append("</table>");

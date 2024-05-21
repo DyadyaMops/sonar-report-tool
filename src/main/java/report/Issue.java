@@ -1,19 +1,17 @@
 package report;
 
+/*Класс определяющий структуру Issue*/
+
 public class Issue {
     private String rule;
     private String severity;
     private String status;
+    private String ruleUrl;
     private String component;
     private int line;
     private String description;
     private String message;
     private String key;
-    private int summary;
-
-    public void setSummary(int summary) {
-        this.summary = summary;
-    }
 
     public void setRule(String rule) {
         this.rule = rule;
@@ -27,9 +25,9 @@ public class Issue {
         this.status = status;
     }
 
-    public void setComponent(String component) {
-        this.component = component;
-    }
+    public void setRuleUrl(String ruleUrl) {this.ruleUrl = ruleUrl;}
+
+    public void setComponent(String component) {this.component = component;}
 
     public void setLine(int line) {
         this.line = line;

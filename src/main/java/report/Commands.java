@@ -4,6 +4,8 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+/*Класс определяющий доступные команды, подающиеся как флаги на вход программы*/
+
 @Command(name = "sonar-report-tool", description = "Generate a vulnerability report from a SonarQube instance.")
 public class Commands implements Runnable {
     @Option(names = "--project", description = "name of the project, displayed in the header of the generated report")
@@ -11,12 +13,6 @@ public class Commands implements Runnable {
 
     @Option(names = "--application", description = "name of the application, displayed in the header of the generated report")
     public String application;
-
-    @Option(names = "--release", description = "name of the release, displayed in the header of the generated report")
-    public String release;
-
-    @Option(names = "--branch", description = "Branch in Sonarqube that we want to get the issues for")
-    public String branch;
 
     @Option(names = "--sonarurl", description = "base URL of the SonarQube instance to query from")
     public String sonarurl;
