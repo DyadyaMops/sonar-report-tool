@@ -183,7 +183,6 @@ public class ExecuteRequest {
         List<Hotspot> hotspots;
 
         static class Hotspot {
-            String ruleUrl;
             String key;
             String message;
             String status;
